@@ -1,4 +1,4 @@
-import { Readable, Writable } from 'node:stream'
+import { Readable, Transform, Writable } from 'node:stream'
 
 class OneToHundredStream extends Readable {
     index = 1;
@@ -18,13 +18,23 @@ class OneToHundredStream extends Readable {
     }
 }
 
+class InverseNumberStream extends Transform {
+    _transform(chunk, encoding, callback) {
+        const number = parseInt(chunk.toString());
+        const result = number * -1;
+        callback(null, `${result}\n`);
+    }
+}
+
 class MultiPlyByTwoStream extends Writable {
     _write(chunk, encoding, callback) {
         const number = parseInt(chunk.toString());
-        const result = number * 2;
+        const result = number * 10;
         console.log(`Double of ${number} is ${result}`);
         callback();
     }
 }
 
-new OneToHundredStream().pipe(new MultiPlyByTwoStream());
+new OneToHundredStream()
+    .pipe(new InverseNumberStream())
+    .pipe(new MultiPlyByTwoStream());
