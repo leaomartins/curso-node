@@ -1,10 +1,13 @@
-import { createServer } from 'http';
+import  http  from 'node:http';
+import { randomUUID } from 'node:crypto';
 import { json } from './middlewares/json.js';
 import { Database } from './database.js';
 
+
+
 const database = new Database();
 
-const server = createServer(async (req, res) => {
+const server = http.createServer(async (req, res) => {
     const { method, url } = req;
 
     await json(req, res);
@@ -13,13 +16,13 @@ const server = createServer(async (req, res) => {
         const { name, email } = req.body;
 
         const user = {
-            id: 1,
+            id: randomUUID(),
             name,
             email,
         };
 
         database.insert('users', user)
-        
+
         return res.writeHead(201).end();
     }
 
